@@ -1,0 +1,22 @@
+# Advait Academy Flutter App Task List
+
+- [ ] Project Setup
+    - [ ] Initialize Flutter project `advait_academy` [/]
+    - [ ] Configure `pubspec.yaml` with dependencies
+    - [ ] Create folder structure (`models`, `services`, `screens`, `widgets`, `providers`)
+- [ ] Data Models
+    - [ ] Create `Staff` model
+    - [ ] Create `SalaryRecord` model
+- [ ] Services & State Management
+    - [ ] Implement `FirestoreService` for CRUD operations
+    - [ ] Implement `StaffProvider` using Provider package
+- [ ] UI Implementation
+    - [ ] Theme Configuration (Green & Orange)
+    - [ ] Home Screen (Staff categories & tabs/sections)
+    - [ ] Add Staff Screen (Form with hourly rate logic)
+    - [ ] Staff Detail Screen (Record list & cumulative total)
+    - [ ] Add Salary Entry (Bottom sheet with auto-calculation)
+- [ ] Verification & Polishing
+    - [ ] Input validation
+    - [ ] Loading & Empty states
+    - [ ] Error handling

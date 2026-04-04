@@ -1,0 +1,24 @@
+# Advait Academy Flutter App Task List
+
+- [x] Project Setup
+    - [x] Initialize project directory structure
+    - [x] Configure [pubspec.yaml](file:///C:/Users/acer/.gemini/antigravity/scratch/advait_academy/pubspec.yaml) with dependencies
+    - [x] Create folder structure (`models`, `services`, `screens`, `widgets`, `providers`)
+- [x] Data Models
+    - [x] Create [Staff](file:///C:/Users/acer/.gemini/antigravity/scratch/advait_academy/lib/models/staff_model.dart#5-42) model
+    - [x] Create [SalaryRecord](file:///C:/Users/acer/.gemini/antigravity/scratch/advait_academy/lib/models/salary_record_model.dart#3-54) model
+- [x] Services & State Management
+    - [x] Implement [FirestoreService](file:///C:/Users/acer/.gemini/antigravity/scratch/advait_academy/lib/services/firestore_service.dart#5-43) for CRUD operations
+    - [x] Implement [StaffProvider](file:///C:/Users/acer/.gemini/antigravity/scratch/advait_academy/lib/providers/staff_provider.dart#6-51) using Provider package
+- [x] UI Implementation
+    - [x] Theme Configuration (Green & Orange)
+    - [x] Home Screen (Staff categories & tabs/sections)
+    - [x] Add Staff Screen (Form with hourly rate logic)
+    - [x] Staff Detail Screen (Record list & cumulative total)
+    - [x] Add Salary Entry (Bottom sheet with auto-calculation)
+- [x] Verification & Polishing
+    - [x] Input validation
+    - [x] Loading & Empty states
+    - [x] Error handling
+- [x] Documentation
+    - [x] Create walkthrough.md [/]
