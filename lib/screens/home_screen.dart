@@ -83,14 +83,20 @@ class HomeScreen extends StatelessWidget {
             );
           },
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AddStaffScreen()),
+        floatingActionButton: Consumer<StaffProvider>(
+          builder: (context, provider, child) {
+            return FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddStaffScreen(category: provider.selectedCategory),
+                  ),
+                );
+              },
+              child: const Icon(Icons.add),
             );
           },
-          child: const Icon(Icons.add),
         ),
       ),
     );

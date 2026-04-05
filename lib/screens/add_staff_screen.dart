@@ -4,7 +4,9 @@ import "../models/staff_model.dart";
 import "../providers/staff_provider.dart";
 
 class AddStaffScreen extends StatefulWidget {
-  const AddStaffScreen({super.key});
+  final String category;
+
+  const AddStaffScreen({super.key, required this.category});
 
   @override
   State<AddStaffScreen> createState() => _AddStaffScreenState();
@@ -13,12 +15,11 @@ class AddStaffScreen extends StatefulWidget {
 class _AddStaffScreenState extends State<AddStaffScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  String _selectedCategory = "Teaching";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Add New Staff")),
+      appBar: AppBar(title: Text("Add ${widget.category} Staff")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Form(
@@ -35,17 +36,23 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                 validator: (val) => (val == null || val.isEmpty) ? "Please enter staff name" : null,
               ),
               const SizedBox(height: 20),
-              DropdownButtonFormField<String>(
-                value: _selectedCategory,
-                decoration: const InputDecoration(
-                  labelText: "Category",
-                  prefixIcon: Icon(Icons.category),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.green[50],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.green[200]!),
                 ),
-                items: const [
-                  DropdownMenuItem(value: "Teaching", child: Text("Teaching Staff")),
-                  DropdownMenuItem(value: "Non-Teaching", child: Text("Non-Teaching Staff")),
-                ],
-                onChanged: (val) => setState(() => _selectedCategory = val!),
+                child: Row(
+                  children: [
+                    const Icon(Icons.category, color: Colors.green),
+                    const SizedBox(width: 12),
+                    Text(
+                      "Category: ${widget.category}",
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 40),
               Consumer<StaffProvider>(
@@ -55,11 +62,10 @@ class _AddStaffScreenState extends State<AddStaffScreen> {
                         ? null
                         : () async {
                             if (_formKey.currentState!.validate()) {
-                              // Force rate to 100 as per new requirements
                               final staff = StaffModel(
                                 id: "",
                                 name: _nameController.text,
-                                category: _selectedCategory,
+                                category: widget.category,
                                 hourlyRate: 100.0,
                                 createdAt: DateTime.now(),
                               );

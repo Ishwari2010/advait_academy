@@ -12,6 +12,7 @@ class StaffProvider with ChangeNotifier {
   String get selectedCategory => _selectedCategory;
 
   void setCategory(String category) {
+    if (_selectedCategory == category) return;
     _selectedCategory = category;
     notifyListeners();
   }
@@ -26,6 +27,7 @@ class StaffProvider with ChangeNotifier {
     try {
       await _supabaseService.addStaff(staff);
     } catch (e) {
+      debugPrint("Error adding staff: $e");
       rethrow;
     } finally {
       setLoading(false);
@@ -33,14 +35,26 @@ class StaffProvider with ChangeNotifier {
   }
 
   Future<void> deleteStaff(String staffId) async {
-    await _supabaseService.deleteStaff(staffId);
+    try {
+      await _supabaseService.deleteStaff(staffId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error deleting staff: $e");
+      rethrow;
+    }
+  }
+
+  Future<List<SalaryRecord>> fetchSalaryRecords(String staffId) async {
+    return await _supabaseService.getSalaryRecordsFuture(staffId);
   }
 
   Future<void> addSalaryRecord(SalaryRecord record) async {
     setLoading(true);
     try {
       await _supabaseService.addSalaryRecord(record);
+      notifyListeners(); 
     } catch (e) {
+      debugPrint("Error adding salary record: $e");
       rethrow;
     } finally {
       setLoading(false);
@@ -48,13 +62,23 @@ class StaffProvider with ChangeNotifier {
   }
 
   Future<void> deleteSalaryRecord(String recordId) async {
-    await _supabaseService.deleteSalaryRecord(recordId);
+    setLoading(true);
+    try {
+      await _supabaseService.deleteSalaryRecord(recordId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint("Error deleting salary record: $e");
+      rethrow;
+    } finally {
+      setLoading(false);
+    }
   }
 
   Stream<List<StaffModel>> getStaffStream() {
     return _supabaseService.getStaffByCategory(_selectedCategory);
   }
 
+  // Legacy stream for screens that still use it
   Stream<List<SalaryRecord>> getSalaryRecordsStream(String staffId) {
     return _supabaseService.getSalaryRecords(staffId);
   }
