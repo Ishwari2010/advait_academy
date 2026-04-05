@@ -1,5 +1,6 @@
-import "package:flutter/material.dart";
+﻿import "package:flutter/material.dart";
 import "package:provider/provider.dart";
+import "package:intl/intl.dart";
 import "../models/staff_model.dart";
 import "../models/salary_record_model.dart";
 import "../providers/staff_provider.dart";
@@ -45,15 +46,6 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
     }
   }
 
-  String _getMonthName(int month) {
-    const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
-    if (month < 1 || month > 12) return "Unknown";
-    return months[month - 1];
-  }
-
   double get _totalPaid => _records.fold(0.0, (sum, item) => sum + (item.totalSalary ?? 0.0));
 
   @override
@@ -90,6 +82,8 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final displayCategory = widget.staff.category == "Teaching" ? "Teaching Staff" : "Non-Teaching Staff";
+
     return Container(
       padding: const EdgeInsets.all(20),
       color: Colors.green[50],
@@ -98,7 +92,7 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(widget.staff.category,
+              Text(displayCategory,
                   style: TextStyle(
                       fontSize: 16,
                       color: Colors.green[900],
@@ -160,9 +154,10 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("${_getMonthName(record.month ?? 0)} ${record.year}",
+                    Text(
+                      "Added: ${DateFormat(\'dd MMM yyyy\').format(record.createdAt)}",
                         style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                            fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
                     IconButton(
                       icon: const Icon(Icons.delete_outline, color: Colors.red, size: 22),
                       onPressed: () => _confirmDeleteSalaryRecord(context, record),
@@ -260,11 +255,13 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
   }
 
   void _confirmDeleteSalaryRecord(BuildContext context, SalaryRecord record) {
+    final label = DateFormat(\'dd MMM yyyy\').format(record.createdAt);
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Delete Entry"),
-        content: Text("Are you sure you want to delete the entry for ${_getMonthName(record.month ?? 0)} ${record.year}?"),
+        content: Text("Are you sure you want to delete the entry for $label?"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           TextButton(
