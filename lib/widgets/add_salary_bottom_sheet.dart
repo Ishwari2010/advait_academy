@@ -128,14 +128,14 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
       TextFormField(
         controller: _daysOfMonthController,
         decoration: const InputDecoration(labelText: "Days of Month", hintText: "e.g. 30"),
-        keyboardType: TextInputType.number,
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
         validator: (v) => v!.isEmpty ? "Required" : null,
       ),
       const SizedBox(height: 10),
       TextFormField(
         controller: _daysWorkedController,
         decoration: const InputDecoration(labelText: "Days Worked", hintText: "e.g. 26"),
-        keyboardType: TextInputType.number,
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
         validator: (v) => v!.isEmpty ? "Required" : null,
       ),
       const SizedBox(height: 10),
@@ -145,7 +145,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
             child: TextFormField(
               controller: _std9HoursController,
               decoration: const InputDecoration(labelText: "Std 9 Hrs", hintText: "Hours"),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
               validator: (v) => v!.isEmpty ? "Required" : null,
             ),
           ),
@@ -154,7 +154,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
             child: TextFormField(
               controller: _std10HoursController,
               decoration: const InputDecoration(labelText: "Std 10 Hrs", hintText: "Hours"),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
               validator: (v) => v!.isEmpty ? "Required" : null,
             ),
           ),
@@ -168,7 +168,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
       TextFormField(
         controller: _basicSalaryController,
         decoration: const InputDecoration(labelText: "Basic Salary (\u{20B9})", hintText: "7000"),
-        keyboardType: TextInputType.number,
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
         validator: (v) => v!.isEmpty ? "Required" : null,
       ),
       const SizedBox(height: 10),
@@ -178,7 +178,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
             child: TextFormField(
               controller: _daysOfMonthController,
               decoration: const InputDecoration(labelText: "Days of Month"),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
               validator: (v) => v!.isEmpty ? "Required" : null,
             ),
           ),
@@ -187,7 +187,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
             child: TextFormField(
               controller: _daysWorkedController,
               decoration: const InputDecoration(labelText: "Days Worked"),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
               validator: (v) => v!.isEmpty ? "Required" : null,
             ),
           ),
@@ -200,7 +200,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
           labelText: "Total Extra Hours (Whole Month)", 
           hintText: "Total extra hours beyond 3hrs/day this month"
         ),
-        keyboardType: TextInputType.number,
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
         validator: (v) => v!.isEmpty ? "Required" : null,
       ),
     ];
@@ -248,7 +248,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(color: Colors.grey)),
-          Text(isMoney ? "\u{20B9}${value.toStringAsFixed(2)}" : "${value.toInt()} hrs", 
+          Text(isMoney ? "\u{20B9}${value.toStringAsFixed(2)}" : "$value hrs", 
                style: const TextStyle(fontWeight: FontWeight.w500)),
         ],
       ),
