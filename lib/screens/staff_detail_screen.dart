@@ -25,16 +25,19 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
   }
 
   Future<void> _loadRecords() async {
+    if (!mounted) return;
     setState(() => _isLoadingRecords = true);
     try {
       final records = await context.read<StaffProvider>().fetchSalaryRecords(widget.staff.id);
-      setState(() {
-        _records = records;
-        _isLoadingRecords = false;
-      });
-    } catch (e) {
-      setState(() => _isLoadingRecords = false);
       if (mounted) {
+        setState(() {
+          _records = records;
+          _isLoadingRecords = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoadingRecords = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Error loading records: $e")),
         );
@@ -51,7 +54,7 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
     return months[month - 1];
   }
 
-  double get _totalPaid => _records.fold(0.0, (sum, item) => sum + item.calculatedSalary);
+  double get _totalPaid => _records.fold(0.0, (sum, item) => sum + (item.totalSalary ?? 0.0));
 
   @override
   Widget build(BuildContext context) {
@@ -100,8 +103,10 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
                       fontSize: 16,
                       color: Colors.green[900],
                       fontWeight: FontWeight.w600)),
-              Text("Rate: \u{20B9}${widget.staff.hourlyRate.toInt()}/hr",
-                  style: const TextStyle(fontSize: 16)),
+              if (widget.staff.category == "Teaching")
+                 const Text("Fixed Rates: Std 9 (\u{20B9}100), Std 10 (\u{20B9}200)")
+              else
+                 const Text("Base Salary: \u{20B9}7000 (Target)"),
             ],
           ),
           const SizedBox(height: 15),
@@ -142,11 +147,15 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
       itemCount: _records.length,
       itemBuilder: (context, index) {
         final record = _records[index];
+        final isTeaching = widget.staff.category == "Teaching";
+
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          elevation: 2,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -161,24 +170,27 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
                   ],
                 ),
                 const Divider(),
+                if (isTeaching) 
+                  _buildTeachingCardData(record)
+                else 
+                  _buildNonTeachingCardData(record),
+                const Divider(),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _infoItem("Days", record.daysWorked.toString()),
-                    _infoItem("Hrs/Day", record.hoursPerDay.toString()),
-                    _infoItem("Total Hrs", record.totalHours.toStringAsFixed(1)),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Rate: \u{20B9}${record.hourlyRate.toInt()}", style: const TextStyle(color: Colors.grey)),
-                    Text("\u{20B9}${record.calculatedSalary.toStringAsFixed(2)}",
-                        style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green)),
+                    const Text("Total Payout:", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green[100],
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text("\u{20B9}${(record.totalSalary ?? 0).toStringAsFixed(2)}",
+                          style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.green)),
+                    ),
                   ],
                 ),
               ],
@@ -189,11 +201,44 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
     );
   }
 
-  Widget _infoItem(String label, String value) {
+  Widget _buildTeachingCardData(SalaryRecord record) {
     return Column(
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        Text(value, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+        _dataRow("Std 9 Hours", "${record.std9Hours} hrs", "\u{20B9}${record.std9Amount?.toStringAsFixed(2)}"),
+        const SizedBox(height: 4),
+        _dataRow("Std 10 Hours", "${record.std10Hours} hrs", "\u{20B9}${record.std10Amount?.toStringAsFixed(2)}"),
+        const SizedBox(height: 4),
+        _dataRow("Days Worked", "${record.daysWorked.toInt()} / ${record.daysOfMonth?.toInt()}", ""),
+      ],
+    );
+  }
+
+  Widget _buildNonTeachingCardData(SalaryRecord record) {
+    return Column(
+      children: [
+        _dataRow("Basic Salary", "\u{20B9}${record.basicSalary?.toStringAsFixed(2)}", ""),
+        const SizedBox(height: 4),
+        _dataRow("Days Worked", "${record.daysWorked.toInt()} / ${record.daysOfMonth?.toInt()}", "\u{20B9}${record.perDayRate?.toStringAsFixed(2)} / day"),
+        const SizedBox(height: 4),
+        _dataRow("Extra Hours", "${record.extraHoursPerDay} hrs/day", "\u{20B9}${record.extraHoursPay?.toStringAsFixed(2)}"),
+      ],
+    );
+  }
+
+  Widget _dataRow(String label, String value, String trailing) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: const TextStyle(color: Colors.black87)),
+        Row(
+          children: [
+            Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+            if (trailing.isNotEmpty) ...[
+              const SizedBox(width: 10),
+              Text(trailing, style: TextStyle(color: Colors.green[800], fontSize: 13)),
+            ],
+          ],
+        ),
       ],
     );
   }
@@ -207,10 +252,10 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
       ),
       builder: (context) => AddSalaryBottomSheet(
         staffId: widget.staff.id,
+        staffCategory: widget.staff.category,
         hourlyRate: widget.staff.hourlyRate,
       ),
     );
-    // Refresh list after modal closes
     _loadRecords();
   }
 
@@ -224,9 +269,9 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(context);
               await context.read<StaffProvider>().deleteSalaryRecord(record.id);
-              _loadRecords(); // Refresh list
+              _loadRecords();
             },
             child: const Text("Delete", style: TextStyle(color: Colors.red)),
           ),
@@ -247,8 +292,8 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
             onPressed: () async {
               await Provider.of<StaffProvider>(context, listen: false).deleteStaff(widget.staff.id);
               if (context.mounted) {
-                Navigator.pop(context); // close dialog
-                Navigator.pop(context); // go back to home
+                Navigator.pop(context);
+                Navigator.pop(context);
               }
             },
             child: const Text("Delete", style: TextStyle(color: Colors.red)),
