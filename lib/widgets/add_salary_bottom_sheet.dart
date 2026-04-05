@@ -1,4 +1,4 @@
-\import "package:flutter/material.dart";
+import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "../models/salary_record_model.dart";
 import "../providers/staff_provider.dart";
@@ -304,4 +304,4 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
     _extraHoursPerDayController.dispose();
     super.dispose();
   }
-}\
+}
