@@ -1,4 +1,4 @@
-import "package:flutter/material.dart";
+﻿import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "../models/salary_record_model.dart";
 import "../providers/staff_provider.dart";
@@ -22,23 +22,21 @@ class AddSalaryBottomSheet extends StatefulWidget {
 class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
   final _formKey = GlobalKey<FormState>();
 
-  // Consonants for common fields
   final _daysOfMonthController = TextEditingController();
   final _daysWorkedController = TextEditingController();
 
-  // Teaching Specific
   final _std9HoursController = TextEditingController();
   final _std10HoursController = TextEditingController();
   double _std9Amount = 0;
   double _std10Amount = 0;
 
-  // Non-Teaching Specific
   final _basicSalaryController = TextEditingController(text: "7000");
-  final _extraHoursPerDayController = TextEditingController();
+  final _extraHoursController = TextEditingController();
   double _perDayRate = 0;
   double _perHourRate = 0;
   double _basicEarned = 0;
   double _extraPay = 0;
+  double _totalExtraHoursCount = 0;
 
   double _totalSalary = 0;
 
@@ -50,11 +48,11 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
     _std9HoursController.addListener(_calculate);
     _std10HoursController.addListener(_calculate);
     _basicSalaryController.addListener(_calculate);
-    _extraHoursPerDayController.addListener(_calculate);
+    _extraHoursController.addListener(_calculate);
   }
 
   void _calculate() {
-    final dom = double.tryParse(_daysOfMonthController.text) ?? 1; // avoid /0
+    final dom = double.tryParse(_daysOfMonthController.text) ?? 1;
     final dw = double.tryParse(_daysWorkedController.text) ?? 0;
 
     if (widget.staffCategory == "Teaching") {
@@ -68,13 +66,14 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
       });
     } else {
       final basic = double.tryParse(_basicSalaryController.text) ?? 0;
-      final extraHPD = double.tryParse(_extraHoursPerDayController.text) ?? 0;
+      final totalH = double.tryParse(_extraHoursController.text) ?? 0;
 
       setState(() {
+        _totalExtraHoursCount = totalH;
         _perDayRate = basic / (dom > 0 ? dom : 1);
         _perHourRate = _perDayRate / 3;
         _basicEarned = _perDayRate * dw;
-        _extraPay = extraHPD * dw * _perHourRate;
+        _extraPay = totalH * _perHourRate;
         _totalSalary = _basicEarned + _extraPay;
       });
     }
@@ -196,8 +195,11 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
       ),
       const SizedBox(height: 10),
       TextFormField(
-        controller: _extraHoursPerDayController,
-        decoration: const InputDecoration(labelText: "Extra Hours Per Day", hintText: "Beyond 3hrs/day"),
+        controller: _extraHoursController,
+        decoration: const InputDecoration(
+          labelText: "Total Extra Hours (Whole Month)", 
+          hintText: "Total extra hours beyond 3hrs/day this month"
+        ),
         keyboardType: TextInputType.number,
         validator: (v) => v!.isEmpty ? "Required" : null,
       ),
@@ -221,6 +223,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
             _summaryRow("Per Day Rate", _perDayRate),
             _summaryRow("Per Hour Rate", _perHourRate),
             _summaryRow("Basic Earned", _basicEarned),
+            _summaryRow("Total Extra Hours", _totalExtraHoursCount),
             _summaryRow("Extra Hours Pay", _extraPay),
           ],
           const Divider(),
@@ -238,13 +241,15 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
   }
 
   Widget _summaryRow(String label, double value) {
+    bool isMoney = label.contains("Amount") || label.contains("Pay") || label.contains("Salary") || label.contains("Rate") || label.contains("Earned");
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: const TextStyle(color: Colors.grey)),
-          Text("\u{20B9}${value.toStringAsFixed(2)}", style: const TextStyle(fontWeight: FontWeight.w500)),
+          Text(isMoney ? "\u{20B9}${value.toStringAsFixed(2)}" : "${value.toInt()} hrs", 
+               style: const TextStyle(fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -258,7 +263,6 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
       final record = SalaryRecord(
         id: "",
         staffId: widget.staffId,
-        // Set month and year to null for Teaching staff
         month: isTeaching ? null : now.month,
         year: isTeaching ? null : now.year,
         daysWorked: double.parse(_daysWorkedController.text),
@@ -269,7 +273,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
         std9Amount: _std9Amount,
         std10Amount: _std10Amount,
         basicSalary: double.tryParse(_basicSalaryController.text),
-        extraHoursPerDay: double.tryParse(_extraHoursPerDayController.text),
+        extraHoursPerDay: double.tryParse(_extraHoursController.text),
         perDayRate: _perDayRate,
         perHourRate: _perHourRate,
         extraHoursPay: _extraPay,
@@ -301,7 +305,7 @@ class _AddSalaryBottomSheetState extends State<AddSalaryBottomSheet> {
     _std9HoursController.dispose();
     _std10HoursController.dispose();
     _basicSalaryController.dispose();
-    _extraHoursPerDayController.dispose();
+    _extraHoursController.dispose();
     super.dispose();
   }
 }

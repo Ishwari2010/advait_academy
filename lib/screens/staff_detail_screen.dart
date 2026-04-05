@@ -155,7 +155,7 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Added: ${DateFormat(\'dd MMM yyyy\').format(record.createdAt)}",
+                      "Added: ${DateFormat('dd MMM yyyy').format(record.createdAt)}",
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueGrey)),
                     IconButton(
@@ -215,7 +215,7 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
         const SizedBox(height: 4),
         _dataRow("Days Worked", "${record.daysWorked.toInt()} / ${record.daysOfMonth?.toInt()}", "\u{20B9}${record.perDayRate?.toStringAsFixed(2)} / day"),
         const SizedBox(height: 4),
-        _dataRow("Extra Hours", "${record.extraHoursPerDay} hrs/day", "\u{20B9}${record.extraHoursPay?.toStringAsFixed(2)}"),
+        _dataRow("Total Extra Hours", "${record.extraHoursPerDay?.toInt() ?? 0} hrs", "\u{20B9}${record.extraHoursPay?.toStringAsFixed(2)}"),
       ],
     );
   }
@@ -255,7 +255,7 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
   }
 
   void _confirmDeleteSalaryRecord(BuildContext context, SalaryRecord record) {
-    final label = DateFormat(\'dd MMM yyyy\').format(record.createdAt);
+    final label = DateFormat('dd MMM yyyy').format(record.createdAt);
 
     showDialog(
       context: context,
@@ -300,3 +300,4 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
     );
   }
 }
+
