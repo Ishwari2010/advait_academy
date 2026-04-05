@@ -160,7 +160,7 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("${_getMonthName(record.month)} ${record.year}",
+                    Text("${_getMonthName(record.month ?? 0)} ${record.year}",
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                     IconButton(
@@ -264,7 +264,7 @@ class _StaffDetailScreenState extends State<StaffDetailScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Delete Entry"),
-        content: Text("Are you sure you want to delete the entry for ${_getMonthName(record.month)} ${record.year}?"),
+        content: Text("Are you sure you want to delete the entry for ${_getMonthName(record.month ?? 0)} ${record.year}?"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
           TextButton(
